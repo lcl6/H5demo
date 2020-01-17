@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试</title>
+    <script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <p> {{ message }}</p>
+        <button v-on:click="message = 'baz'"> change it </button>
+    </div>
+
+
+
+    <div id="app1">
+        <p>{{ foo }}</p>
+        <!-- 这里的 `foo` 不会更新！ -->
+        <button v-on:click="foo = 'baz'">Change it</button>
+    </div>
+
+    <div id="example"> 
+        <p> this is message:{{testex}}</p>
+        <p> this is reversedMessage:{{reversedMessage}}</p>
+
+    </div>
+
+
+
+
+</body>
+
+<script>
+    var obj = {
+        foo: 'bar'
+    }
+
+    // Object.freeze(obj)
+
+    new Vue({
+        el: '#app1',
+        data: obj
+    })
+
+    var msg = {
+        message: 'hahahh'
+    }
+    // Object.freeze(msg)
+    var app = new Vue({
+        el: '#app',
+        data: msg
+    })
+
+
+    
+    var vma=    new Vue({
+        beforeCreate :function(){
+            console.log('beforeCreate' )
+        },
+        data:{
+            a:1
+        },
+        //created 钩子可以用来被创建后执行
+        created : function(){
+            console.log('created a = s' +this.a)
+        },
+        beforeMount : function(){
+            console.log('beforeMount a = s' +this.a)
+        },
+        mounted : function(){
+            console.log('mounted a = s' +this.a)
+        },
+        beforeUpdate: function(){
+            console.log('beforeUpdate a = s' +this.a)
+        },
+
+        updated: function(){
+            console.log('updated a = s' +this.a)
+        },
+        beforeDestroy: function(){
+            console.log('beforeDestroy a = s' +this.a)
+        },
+        destroyed: function(){
+            console.log('destroyed a = s' +this.a)
+        },
+        
+    })
+
+
+    //计算属性
+    var vm =new Vue({
+        el:'#example',
+        data:{
+            testex:'你好'
+        },
+        computed:{
+            reversedMessage:function(){
+                return this.testex.split('').reverse().join('')
+            }
+            
+        }
+    })
+
+
+</script>
+
+
+</html>
