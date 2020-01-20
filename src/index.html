@@ -8,9 +8,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>测试</title>
     <script src="https://cdn.bootcss.com/vue/2.4.2/vue.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+    <link rel="stylesheet" href="style/test.css">
+
 </head>
 
-<body>
+<body >
     <div id="app">
         <p> {{ message }}</p>
         <button v-on:click="message = 'baz'"> change it </button>
@@ -24,13 +29,65 @@
         <button v-on:click="foo = 'baz'">Change it</button>
     </div>
 
-    <div id="example"> 
+    <div id="example">
         <p> this is message:{{testex}}</p>
-        <p> this is reversedMessage:{{reversedMessage}}</p>
+        <p> this is reversedMessage1:{{reversedMe}}</p>
+        <p> this is reversedMessage2:{{reversedMessage()}}</p>
+
+    </div>
+
+    <div id="testp">{{fullName}}</div>
+
+
+
+    <div id="watchmessage">
+
+        <p>
+            Ask a yes/no question:
+            <input v-model='question'>
+        </p>
+        <div>{{answer}} </div>
 
     </div>
 
 
+    <p>Using mustaches: {{ rawHtml }}</p>
+
+    <p>Using v-html directive: <span v-html="rawHtml"></span></p>
+
+    <div id="viewvalue">
+        <span> {{viewvv}} </span>
+
+        <p v-if="viewvv=='a'">v-if等于a 时显示</p>
+        <p v-else="viewvv=='b'">v-if等于b 时显示</p>
+        <button @click="change">改变状态</button>
+    </div>
+
+
+    <div id="testbind" :class="[iscolor?'':st1,iscolor?st2:'']">
+        <p> 测试样式</p>
+        <p> 测试样式2</p>
+        <p> 测试样式3</p>
+
+        <button @click='changesty'> 切换颜色 </button @click=''>
+
+    </div>
+
+
+
+    <ul id="list"> 
+        <li v-for="(item,index) in items">
+            {{item.message}}-{{index}}
+        </li>
+    </ul> 
+
+
+    <div id="click_stop" >
+        <p>{{clickmsg}}</p>
+
+        <button @click.stop="clickStop('sss')">点击消息</button>
+
+    </div>
 
 
 </body>
@@ -39,14 +96,11 @@
     var obj = {
         foo: 'bar'
     }
-
     // Object.freeze(obj)
-
     new Vue({
         el: '#app1',
         data: obj
     })
-
     var msg = {
         message: 'hahahh'
     }
@@ -55,56 +109,194 @@
         el: '#app',
         data: msg
     })
-
-
-    
-    var vma=    new Vue({
-        beforeCreate :function(){
-            console.log('beforeCreate' )
+    var vma = new Vue({
+        beforeCreate: function () {
+            console.log('beforeCreate')
         },
-        data:{
-            a:1
+        data: {
+            a: 1
         },
         //created 钩子可以用来被创建后执行
-        created : function(){
-            console.log('created a = s' +this.a)
+        created: function () {
+            console.log('created a = s' + this.a)
         },
-        beforeMount : function(){
-            console.log('beforeMount a = s' +this.a)
+        beforeMount: function () {
+            console.log('beforeMount a = s' + this.a)
         },
-        mounted : function(){
-            console.log('mounted a = s' +this.a)
+        mounted: function () {
+            console.log('mounted a = s' + this.a)
         },
-        beforeUpdate: function(){
-            console.log('beforeUpdate a = s' +this.a)
+        beforeUpdate: function () {
+            console.log('beforeUpdate a = s' + this.a)
         },
 
-        updated: function(){
-            console.log('updated a = s' +this.a)
+        updated: function () {
+            console.log('updated a = s' + this.a)
         },
-        beforeDestroy: function(){
-            console.log('beforeDestroy a = s' +this.a)
+        beforeDestroy: function () {
+            console.log('beforeDestroy a = s' + this.a)
         },
-        destroyed: function(){
-            console.log('destroyed a = s' +this.a)
+        destroyed: function () {
+            console.log('destroyed a = s' + this.a)
         },
-        
+
     })
-
-
-    //计算属性
-    var vm =new Vue({
-        el:'#example',
-        data:{
-            testex:'你好'
+    //计算属性 有缓存 方法没有缓存会重新渲染
+    var vm = new Vue({
+        el: '#example',
+        data: {
+            testex: '你好'
         },
-        computed:{
-            reversedMessage:function(){
+        computed: {
+            reversedMe: function () {
                 return this.testex.split('').reverse().join('')
             }
-            
+
+        },
+        methods: {
+            reversedMessage: function () {
+                return this.testex.split('').reverse().join('')
+            }
         }
     })
+    new Vue({
+        el: '#testp',
+        data: {
+            firstName: 'aaa',
+            secondeName: 'bbb',
+            // fullName: 'ccc',
+
+        },
+        // watch: {
+        //     firstName: function (val) {
+        //         this.fullName = val + ' ' + this.secondeName
+        //     },
+        //     secondeName: function (val) {
+        //         this.fullName = this.firstName + ' ' + val
+        //     }
+
+        // }
+
+        computed: {
+            fullName: function () {
+                return this.firstName + ' ' + this.secondeName
+            }
+        }
+
+
+    })
+    var watchVue = new Vue({
+        el: '#watchmessage',
+        data: {
+            question: '',
+            answer: 'i cannot give a right answer'
+        },
+        watch: {
+            question: function (newq, oldq) {
+                this.answer = 'waiting for you to stop typing' + newq
+                this.debouncer()
+            }
+
+        },
+
+        created: function () {
+            this.debouncer = _.debounce(this.getAnswer, 500)
+        },
+        methods: {
+            getAnswer: function () {
+                if (this.question.indexOf('?') === -1) {
+                    this.answer = 'Questions usually contain a question mark. ;-)'
+                    return
+                }
+                this.answer = 'Thinking....'
+                var vm = this
+                axios.get('https://yesno.wtf/api')
+                    .then(function (response) {
+                        vm.answer = _.capitalize(response.data.answer)
+                    }).catch(function (error) {
+                        vm.answer = 'Error! Could not reach the API. ' + error
+                    })
+
+            }
+
+        }
+
+
+
+    })
+    new Vue({
+        el: '#viewvalue',
+        data: {
+            viewvv: 'a'
+        },
+        methods: {
+            change: function () {
+                let c = this
+                if (c.viewvv == 'a') {
+                    c.viewvv = 'b'
+                } else {
+                    c.viewvv = 'a'
+                }
+            }
+        }
+    })
+    new Vue({
+        el: '#testbind',
+        data: {
+            st1: 'textSize',
+            st2: 'textColor',
+            iscolor: false
+        },
+        methods: {
+            changesty: function () {
+                let c = this
+                this.iscolor = !this.iscolor
+            }
+        }
+
+
+    })
+    new Vue({
+
+        el:'#list',
+        data:{
+            items:[
+                {
+                    message:'aaaaa'
+                },{
+                    message:'bbbbb'
+                },{
+                    message:'bbbbb'
+                },{
+                    message:'bbbbb'
+                },{
+                    message:'bbbbb'
+                },{
+                    message:'bbbbb'
+                },{
+                    message:'bbbbb'
+                },
+            ]
+          
+        }
+
+    })
+
+    new Vue({
+        el:'#click_stop',
+        data:{
+            clickmsg:'点击消息'
+        },
+        methods:{
+            clickStop :function(msg){
+                this.clickmsg+=msg
+            }
+        }
+
+    })
+
+
+
 
 
 </script>
